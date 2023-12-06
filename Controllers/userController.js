@@ -33,7 +33,18 @@ const registerUser = expressAsyncHandler(async (req, res) => {
   });
   console.log(`user created successfully" ${newUser}`);
   if (newUser) {
-    res.status(201).json({ _id: newUser._id, email: newUser.email });
+    const accessToken = jwt.sign(
+      {
+        user: {
+          username: username,
+          email: email,
+          id: newUser._id,
+        },
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      {expiresIn: "24h"}
+    );
+    res.status(201).json({ _id: newUser._id, email: newUser.email, authToken:accessToken });
   } else {
     res.status(400);
     throw new Error("user data is not valid!");
@@ -75,7 +86,7 @@ const loginUser = expressAsyncHandler(async (req, res) => {
 });
 
 //@desc current user info
-//@route POST /api/users/current
+//@route GET /api/users/current
 //@access private
 const currentUser = expressAsyncHandler(async (req,res)=>{
     res.json(req.user);
