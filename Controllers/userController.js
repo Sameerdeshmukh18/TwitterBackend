@@ -37,7 +37,7 @@ const registerUser = expressAsyncHandler(async (req, res) => {
     const accessToken = jwt.sign(
       {
         user: {
-          name: user.name,
+          name: name,
           username: username,
           id: newUser._id,
         },
@@ -96,8 +96,8 @@ const currentUser = expressAsyncHandler(async (req, res) => {
 });
 
 //@desc get another users informaion
-//@route GET /api/users/userDetails/:id
-//@access private
+//@route GET /api/users/:id
+//@access public
 
 const userDetails = expressAsyncHandler(async (req, res) => {
   const user_id = req.params.id;
