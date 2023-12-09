@@ -81,7 +81,7 @@ const loginUser = expressAsyncHandler(async (req, res) => {
     res.status(200).json({ accessToken });
   } else {
     res.status(400);
-    throw new Error("invalid credentials!");
+    throw new Error("Invalid Credentials!");
   }
 });
 
