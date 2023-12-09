@@ -9,9 +9,9 @@ const { default: mongoose } = require("mongoose");
 //@access public
 
 const registerUser = expressAsyncHandler(async (req, res) => {
-  const { username, email, password, dob } = req.body;
+  const { username, email, password, dob, name } = req.body;
 
-  if (!email || !username || !password || !dob) {
+  if (!email || !username || !password || !dob || !name) {
     res.status(400);
     throw new Error("All fields are mandatory!");
   }
@@ -26,6 +26,7 @@ const registerUser = expressAsyncHandler(async (req, res) => {
   console.log("the hashed password is", hashedPassword);
 
   const newUser = await User.create({
+    name,
     username,
     email,
     dob,
@@ -36,15 +37,17 @@ const registerUser = expressAsyncHandler(async (req, res) => {
     const accessToken = jwt.sign(
       {
         user: {
+          name: user.name,
           username: username,
-          email: email,
           id: newUser._id,
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      {expiresIn: "24h"}
+      { expiresIn: "24h" }
     );
-    res.status(201).json({ _id: newUser._id, email: newUser.email, authToken:accessToken });
+    res
+      .status(201)
+      .json({ _id: newUser._id, email: newUser.email, authToken: accessToken });
   } else {
     res.status(400);
     throw new Error("user data is not valid!");
@@ -69,13 +72,13 @@ const loginUser = expressAsyncHandler(async (req, res) => {
     const accessToken = jwt.sign(
       {
         user: {
+          name: user.name,
           username: user.username,
-          email: user.email,
           id: user.id,
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      {expiresIn: "24h"}
+      { expiresIn: "24h" }
     );
     console.log("successful login");
     res.status(200).json({ accessToken });
@@ -88,8 +91,33 @@ const loginUser = expressAsyncHandler(async (req, res) => {
 //@desc current user info
 //@route GET /api/users/current
 //@access private
-const currentUser = expressAsyncHandler(async (req,res)=>{
-    res.json(req.user);
+const currentUser = expressAsyncHandler(async (req, res) => {
+  res.json(req.user);
 });
 
-module.exports = { registerUser, loginUser,currentUser };
+//@desc get another users informaion
+//@route GET /api/users/userDetails/:id
+//@access private
+
+const userDetails = expressAsyncHandler(async (req, res) => {
+  const user_id = req.params.id;
+
+  if (!user_id) {
+    res.status(400);
+    throw new Error("Invalid User Id");
+  }
+  const user = await User.findOne({ _id: user_id });
+  if (!user) {
+    res.status(400);
+    throw new Error("Invalid User Id");
+  }
+  res
+    .status(200)
+    .json({
+      name: user.name,
+      username: user.username,
+      isVerified: user.isVerified,
+    });
+});
+
+module.exports = { registerUser, loginUser, currentUser, userDetails };
