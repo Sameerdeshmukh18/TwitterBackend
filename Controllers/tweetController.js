@@ -163,7 +163,7 @@ const unShareTweet = expressAsyncHandler(async (req, res) => {
   }
   if (tweet.user_id.toString() == req.user.id) {
     res.status(403);
-    throw new Error("user cannot share his own tweet");
+    throw new Error("user cannot unshare his own tweet");
   }
 
   const unSharedTweet = await Tweet.findByIdAndUpdate(req.params.id, {

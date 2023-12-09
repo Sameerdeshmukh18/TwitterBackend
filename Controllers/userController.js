@@ -120,4 +120,29 @@ const userDetails = expressAsyncHandler(async (req, res) => {
     });
 });
 
-module.exports = { registerUser, loginUser, currentUser, userDetails };
+//@desc edit bio
+//@route PUT /api/users/editBio
+//@access private
+
+const editBio = expressAsyncHandler(async (req, res) => {
+
+  const {bio} = req.body;
+  if (!bio) {
+    res.status(400);
+    throw new Error("Please enter bio");
+  }
+  const user = await User.findOne({ _id: req.user.id });
+  if (!user) {
+    res.status(400);
+    throw new Error("Invalid User Id");
+  }
+
+  const editedBio = await User.findByIdAndUpdate(req.user.id, {bio: bio}, {new: true});
+
+  if(editedBio){
+    res.status(201).json({bio: editedBio.bio})
+  }
+
+})
+
+module.exports = { registerUser, loginUser, currentUser, userDetails, editBio };
