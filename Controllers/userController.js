@@ -145,4 +145,24 @@ const editBio = expressAsyncHandler(async (req, res) => {
 
 })
 
-module.exports = { registerUser, loginUser, currentUser, userDetails, editBio };
+//@desc check for username's availability
+//@route GET /api/users/checkUsername/:username
+//@access public
+
+const checkUsername = expressAsyncHandler(async (req, res) => {
+  const username = req.params.username;
+  if (!username) {
+    res.status(400);
+    throw new Error("Please provide username");
+  }
+  const usernameAvailable = await User.findOne({ username });
+  if (usernameAvailable) {
+    res.status(400);
+    throw new Error("Username is already taken!");
+  }
+  
+  res.status(200).send({availability: "true" })
+
+});
+
+module.exports = { registerUser, loginUser, currentUser, userDetails, editBio, checkUsername };
