@@ -1,12 +1,15 @@
 const expressAsyncHandler = require("express-async-handler");
 const Tweet = require("../Models/tweetModel");
 const User = require("../Models/userModel");
+const {userDetails} = require('../Controllers/userController');
+ 
 
 //@desc get all tweets done by me
 //@route GET /api/tweets/mytweets
 //@access private
 
 const getMyTweets = expressAsyncHandler(async (req, res) => {
+  
   const user = await User.findById(req.user.id);
   if (!user) {
     res.status(404);
@@ -39,16 +42,28 @@ const getMyTweets = expressAsyncHandler(async (req, res) => {
 //@access private
 
 const createTweet = expressAsyncHandler(async (req, res) => {
+  console.log("Creating tweet");
   const { tweet } = req.body;
+
+  const user = await User.findOne({ _id: req.user.id });
+  if(!user){
+    res.status(404);
+    throw new Error("User not found");
+  }
   if (!tweet) {
     res.status(400);
     throw new Error("All fields are mandatory!");
   } else {
-    const newTweet = Tweet.create({
+    console.log(tweet);
+    const newTweet = await Tweet.create({
+      name: user.name,
+      username: user.username,
+      isVerified: user.isVerified,
       user_id: req.user.id,
       tweet_text: tweet,
     });
-    res.status(201).json({ tweet_text: newTweet.tweet_text });
+    console.log(newTweet);
+    res.status(201).json({ tweet: newTweet});
   }
 });
 
