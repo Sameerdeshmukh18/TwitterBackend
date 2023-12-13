@@ -14,6 +14,7 @@ app.use(cors());
 app.use('/api/users',require("./Routes/UserRoutes"));
 app.use('/api/tweets',require("./Routes/TweetRoutes"));
 app.use('/api/friendship',require("./Routes/FriendshipRoutes"));
+app.use("/api/comments", require("./Routes/CommentRoutes"));
 app.use(errorHandler);
 
 
