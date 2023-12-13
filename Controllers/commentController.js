@@ -96,7 +96,7 @@ const deleteComment = expressAsyncHandler(async (req, res) => {
 });
 
 // //@desc update comment
-// //@route PUT /api/comment/:id
+// //@route PUT /api/comments/:id
 // //@access private
 const updateComment = expressAsyncHandler(async (req, res) => {
   const comment = await Comment.findById(req.params.id);
@@ -119,7 +119,7 @@ const updateComment = expressAsyncHandler(async (req, res) => {
 });
 
 // //@desc like a comment
-// //@route PUT /api/comment/likes/create/:id
+// //@route PUT /api/comments/likes/create/:id
 // //@access private
 
 const likeComment = expressAsyncHandler(async (req, res) => {
@@ -153,7 +153,7 @@ const disLikeComment = expressAsyncHandler(async (req, res) => {
 });
 
 // @desc share a Tweet
-// @route PUT /api/tweets/shares/create/:id
+// @route PUT /api/comments/shares/create/:id
 // @access private
 
 module.exports = {
