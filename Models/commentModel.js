@@ -35,10 +35,22 @@ const commentSchema = mongoose.Schema(
       type: String,
       required: [true, "please add the tweet text"],
     },
+    liked_by: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    shared_by: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     timestamp: true,
   }
 );
 
-module.exports = mongoose.model("Comment",commentSchema);
+module.exports = mongoose.model("Comment", commentSchema);
