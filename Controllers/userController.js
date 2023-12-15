@@ -4,6 +4,14 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { default: mongoose } = require("mongoose");
 
+const checkAuth = (context) => {
+  const user = context.user;
+  console.log("User", user);
+  if (!user) {
+    throw new Error("Authentication failed");
+  }
+};
+
 //@desc register a user
 //@route POST /api/users/register
 //@access public
@@ -53,6 +61,27 @@ const registerUser = expressAsyncHandler(async (req, res) => {
     throw new Error("user data is not valid!");
   }
 });
+//resolver
+const registerUser_g = async (_, { name, username, email, password }) => {
+  const userAvailable = await User.findOne({ email });
+  if (userAvailable) {
+    throw new Error("user already registered!");
+  }
+  // Hash password
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  console.log("the hashed password is", hashedPassword);
+
+  const newUser = await User.create({
+    name,
+    username,
+    email,
+    password: hashedPassword,
+  });
+  console.log(`user created successfully" ${newUser}`);
+
+  return newUser;
+};
 
 //@desc Login user
 //@route POST /api/users/login
@@ -87,6 +116,32 @@ const loginUser = expressAsyncHandler(async (req, res) => {
     throw new Error("Invalid Credentials!");
   }
 });
+//resolver
+const loginUser_g = async (_, { email, password }) => {
+  if (!email || !password) {
+    throw new Error("All fields are mandatory!");
+  }
+
+  const user = await User.findOne({ email });
+  if (user && (await bcrypt.compare(password, user.password))) {
+    const token = jwt.sign(
+      {
+        user: {
+          name: user.name,
+          username: user.username,
+          id: user.id,
+        },
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "24h" }
+    );
+    console.log("successful login");
+    console.log(token);
+    return { token };
+  } else {
+    throw new Error("Invalid Credentials!");
+  }
+};
 
 //@desc current user info
 //@route GET /api/users/current
@@ -111,22 +166,30 @@ const userDetails = expressAsyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Invalid User Id");
   }
-  res
-    .status(200)
-    .json({
-      name: user.name,
-      username: user.username,
-      isVerified: user.isVerified,
-    });
+  res.status(200).json({
+    name: user.name,
+    username: user.username,
+    isVerified: user.isVerified,
+  });
 });
+//resolver
+const userDetails_g = async (_, { user_id }, context) => {
+  // Check authentication
+  checkAuth(context);
+  try {
+    const user = await User.findById(user_id);
+    return user;
+  } catch (error) {
+    throw new Error("Error fetching user by ID");
+  }
+};
 
 //@desc edit bio
 //@route PUT /api/users/editBio
 //@access private
 
 const editBio = expressAsyncHandler(async (req, res) => {
-
-  const {bio} = req.body;
+  const { bio } = req.body;
   if (!bio) {
     res.status(400);
     throw new Error("Please enter bio");
@@ -137,13 +200,16 @@ const editBio = expressAsyncHandler(async (req, res) => {
     throw new Error("Invalid User Id");
   }
 
-  const editedBio = await User.findByIdAndUpdate(req.user.id, {bio: bio}, {new: true});
+  const editedBio = await User.findByIdAndUpdate(
+    req.user.id,
+    { bio: bio },
+    { new: true }
+  );
 
-  if(editedBio){
-    res.status(201).json({bio: editedBio.bio})
+  if (editedBio) {
+    res.status(201).json({ bio: editedBio.bio });
   }
-
-})
+});
 
 //@desc check for username's availability
 //@route GET /api/users/checkUsername/:username
@@ -160,9 +226,18 @@ const checkUsername = expressAsyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Username is already taken!");
   }
-  
-  res.status(200).send({availability: "true" })
 
+  res.status(200).send({ availability: "true" });
 });
 
-module.exports = { registerUser, loginUser, currentUser, userDetails, editBio, checkUsername };
+module.exports = {
+  registerUser,
+  registerUser_g,
+  loginUser,
+  loginUser_g,
+  currentUser,
+  userDetails,
+  userDetails_g,
+  editBio,
+  checkUsername,
+};

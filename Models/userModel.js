@@ -18,11 +18,11 @@ const userSchema = mongoose.Schema(
     },
     dob: {
       type: Date,
-      required: [true, "please add the date of birth"],
+      // required: [true, "please add the date of birth"],
     },
     bio: {
       type: String,
-      default: ""
+      default: "",
     },
     password: {
       type: String,
