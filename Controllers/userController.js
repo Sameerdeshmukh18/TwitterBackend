@@ -8,7 +8,9 @@ const checkAuth = (context) => {
   const user = context.user;
   console.log("User", user);
   if (!user) {
-    throw new Error("Authentication failed");
+    return false;
+  } else {
+    return true;
   }
 };
 
@@ -62,21 +64,20 @@ const registerUser = expressAsyncHandler(async (req, res) => {
   }
 });
 //resolver
-const registerUser_g = async (_, { name, username, email, password }) => {
+const registerUser_g = async (_, { name, username, email, password, dob }) => {
   const userAvailable = await User.findOne({ email });
   if (userAvailable) {
     throw new Error("user already registered!");
   }
-  // Hash password
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  console.log("the hashed password is", hashedPassword);
 
   const newUser = await User.create({
     name,
     username,
     email,
     password: hashedPassword,
+    dob,
   });
   console.log(`user created successfully" ${newUser}`);
 
@@ -136,8 +137,7 @@ const loginUser_g = async (_, { email, password }) => {
       { expiresIn: "24h" }
     );
     console.log("successful login");
-    console.log(token);
-    return { token };
+    return token;
   } else {
     throw new Error("Invalid Credentials!");
   }
@@ -175,12 +175,28 @@ const userDetails = expressAsyncHandler(async (req, res) => {
 //resolver
 const userDetails_g = async (_, { user_id }, context) => {
   // Check authentication
-  checkAuth(context);
-  try {
-    const user = await User.findById(user_id);
-    return user;
-  } catch (error) {
-    throw new Error("Error fetching user by ID");
+  if (checkAuth(context)) {
+    try {
+      const user = await User.findById(user_id);
+      return user;
+    } catch (error) {
+      throw new Error("Error fetching user by ID");
+    }
+  } else {
+    throw new Error("User not authorized");
+  }
+};
+//Tweet and Comment user resolver
+const getUser = async (entity, _, context) => {
+  if (checkAuth(context)) {
+    try {
+      const user = await User.findById(entity.user_id);
+      return user;
+    } catch (error) {
+      throw new Error("Error fetching user by ID");
+    }
+  } else {
+    throw new Error("User not authorized");
   }
 };
 
@@ -238,6 +254,7 @@ module.exports = {
   currentUser,
   userDetails,
   userDetails_g,
+  getUser,
   editBio,
   checkUsername,
 };

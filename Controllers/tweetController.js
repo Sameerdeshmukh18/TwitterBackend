@@ -1,15 +1,42 @@
 const expressAsyncHandler = require("express-async-handler");
 const Tweet = require("../Models/tweetModel");
 const User = require("../Models/userModel");
-const {userDetails} = require('../Controllers/userController');
- 
+
+const checkAuth = (context) => {
+  const user = context.user;
+  if (!user) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
+//resolver
+//@route Get
+const getTweet_g = async (_, { tweet_id }, context) => {
+  if (checkAuth(context)) {
+    const tweet = await Tweet.findById(tweet_id);
+    if (tweet) {
+      return tweet;
+    } else {
+      throw new Error("Couldn't find tweet");
+    }
+  } else {
+    throw new Error("User not authorized");
+  }
+};
+
+//resolver
+//@route Get
+const getLikedBy = async (tweet, _, context) => {
+  return tweet.liked_by.map((user_id) => User.findById(user_id));
+};
 
 //@desc get all tweets done by me
 //@route GET /api/tweets/mytweets
 //@access private
 
 const getMyTweets = expressAsyncHandler(async (req, res) => {
-  
   const user = await User.findById(req.user.id);
   if (!user) {
     res.status(404);
@@ -36,6 +63,19 @@ const getMyTweets = expressAsyncHandler(async (req, res) => {
 
   res.status(200).json(myTweets);
 });
+//resolver
+const getMyTweets_g = async (_, { user_id }, context) => {
+  if (checkAuth(context)) {
+    const myTweets = await Tweet.find({ user_id: context.user.id });
+    if (!myTweets) {
+      throw new Error("cannot find any tweet");
+    }
+
+    return myTweets;
+  } else {
+    throw new Error("User not authorized");
+  }
+};
 
 //@desc create new tweet
 //@route POST /api/tweets
@@ -46,7 +86,7 @@ const createTweet = expressAsyncHandler(async (req, res) => {
   const { tweet } = req.body;
 
   const user = await User.findOne({ _id: req.user.id });
-  if(!user){
+  if (!user) {
     res.status(404);
     throw new Error("User not found");
   }
@@ -63,9 +103,22 @@ const createTweet = expressAsyncHandler(async (req, res) => {
       tweet_text: tweet,
     });
     console.log(newTweet);
-    res.status(201).json({ tweet: newTweet});
+    res.status(201).json({ tweet: newTweet });
   }
 });
+//resolver
+const createTweet_g = async (_, { tweet }, context) => {
+  if (checkAuth(context)) {
+    const newTweet = await Tweet.create({
+      user_id: context.user.id,
+      tweet_text: tweet,
+    });
+    console.log(newTweet);
+    return newTweet;
+  } else {
+    throw new Error("User not authorized");
+  }
+};
 
 //@desc delete tweet
 //@route DELETE /api/tweets/:id
@@ -109,6 +162,27 @@ const updateTweet = expressAsyncHandler(async (req, res) => {
   });
   res.status(200).json(updatedTweet);
 });
+//resolver
+const updateTweet_g = async (_, { tweet_id, tweet_text }, context) => {
+  if (checkAuth(context)) {
+    const tweet = await Tweet.findById(tweet_id);
+
+    if (!tweet) {
+      throw new Error("Tweet does not exist!");
+    }
+    if (tweet.user_id.toString() != context.user.id) {
+      throw new Error(
+        "user does not have permission to update other users tweet!"
+      );
+    }
+    const updatedTweet = await Tweet.findByIdAndUpdate(tweet_id, {
+      tweet_text: tweet_text,
+    });
+    return updatedTweet;
+  } else {
+    throw new Error("User not authorized");
+  }
+};
 
 //@desc like a Tweet
 //@route PUT /api/tweets/likes/create/:id
@@ -126,6 +200,28 @@ const likeTweet = expressAsyncHandler(async (req, res) => {
   });
   res.status(200).json(LikedTweet);
 });
+//resolver
+const likeTweet_g = async (_, { tweet_id }, context) => {
+  if (checkAuth(context)) {
+    const tweet = await Tweet.findById(tweet_id);
+    if (!tweet) {
+      throw new Error("Tweet does not exist!");
+    } else {
+      const t = await Tweet.findById(tweet_id);
+
+      if (!t.liked_by.includes(context.user.id)) {
+        const LikedTweet = await Tweet.findByIdAndUpdate(tweet_id, {
+          $push: { liked_by: context.user.id },
+        });
+        return LikedTweet;
+      } else {
+        throw new Error("User already liked");
+      }
+    }
+  } else {
+    throw new Error("User not authorized");
+  }
+};
 
 //@desc takeback your like from a Tweet
 //@route PUT /api/tweets/likes/destroy/:id
@@ -143,6 +239,28 @@ const disLikeTweet = expressAsyncHandler(async (req, res) => {
   });
   res.status(200).json(dislikedTweet);
 });
+//resolver
+const disLikeTweet_g = async (_, { tweet_id }, context) => {
+  if (checkAuth(context)) {
+    const tweet = await Tweet.findById(tweet_id);
+    if (!tweet) {
+      throw new Error("Tweet does not exist!");
+    } else {
+      const t = await Tweet.findById(tweet_id);
+
+      if (t.liked_by.includes(context.user.id)) {
+        const dislikedTweet = await Tweet.findByIdAndUpdate(tweet_id, {
+          $pull: { liked_by: context.user.id },
+        });
+        return dislikedTweet;
+      } else {
+        throw new Error("User didnt liked the tweet");
+      }
+    }
+  } else {
+    throw new Error("User not authorized");
+  }
+};
 
 //@desc share a Tweet
 //@route PUT /api/tweets/shares/create/:id
@@ -243,12 +361,19 @@ const userTimeline = expressAsyncHandler(async (req, res) => {
 });
 
 module.exports = {
+  getTweet_g,
   createTweet,
+  createTweet_g,
   getMyTweets,
+  getMyTweets_g,
   deleteTweet,
   updateTweet,
+  updateTweet_g,
   likeTweet,
+  likeTweet_g,
+  getLikedBy,
   disLikeTweet,
+  disLikeTweet_g,
   shareTweet,
   unShareTweet,
   homeTimeline,
