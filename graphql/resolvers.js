@@ -5,6 +5,7 @@ const {
   loginUser_g,
   userDetails_g,
   getUser,
+  checkUsername,
 } = require("../Controllers/userController");
 
 const {
@@ -15,7 +16,18 @@ const {
   likeTweet_g,
   disLikeTweet_g,
   getLikedBy,
+  homeTimeline_g,
+  userTimeline_g,
 } = require("../Controllers/tweetController");
+
+const {
+  getComments_g,
+  createComment_g,
+  updateComment_g,
+  likeComment_g,
+  disLikeComment_g,
+  deleteComment_g,
+} = require("../Controllers/commentController");
 
 const dateScalar = new GraphQLScalarType({
   name: "Date",
@@ -47,11 +59,19 @@ const resolvers = {
   Tweet: {
     user: (tweet, _, context) => getUser(tweet, _, context),
     liked_by: (tweet, _, context) => getLikedBy(tweet, _, context),
+    comments: (tweet, _, context) => getComments_g(tweet, _, context),
+  },
+  Comment: {
+    user: (tweet, _, context) => getUser(tweet, _, context),
+    liked_by: (tweet, _, context) => getLikedBy(tweet, _, context),
   },
   Query: {
     getUserById: userDetails_g,
     getTweetById: getTweet_g,
     getMyTweets: getMyTweets_g,
+    checkUsername: checkUsername,
+    homeTimeline: homeTimeline_g,
+    userTimeline: userTimeline_g,
   },
   Mutation: {
     register: registerUser_g,
@@ -60,6 +80,11 @@ const resolvers = {
     updateTweet: updateTweet_g,
     likeTweet: likeTweet_g,
     disLikeTweet: disLikeTweet_g,
+    createComment: createComment_g,
+    updateComment: updateComment_g,
+    deleteComment: deleteComment_g,
+    likeComment: likeComment_g,
+    disLikeComment: disLikeComment_g,
   },
 };
 
