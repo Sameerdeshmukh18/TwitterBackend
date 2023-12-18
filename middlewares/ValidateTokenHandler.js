@@ -40,4 +40,4 @@ const contextMiddleware = async ({ req, res }) => {
   }
 };
 
-module.exports = { validateToken, contextMiddleware };
+module.exports = validateToken;
