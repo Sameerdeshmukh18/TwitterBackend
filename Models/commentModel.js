@@ -2,6 +2,24 @@ const mongoose = require("mongoose");
 
 const commentSchema = mongoose.Schema(
   {
+    username: {
+      type: String,
+      require: true,
+      ref: "User",
+      required: [true, "username is required"],
+    },
+    name: {
+      type: String,
+      require: true,
+      ref: "User",
+      required: [true, "name is required"],
+    },
+    isVerified: {
+      type: Boolean,
+      require: true,
+      ref: "User",
+      required: [true, "isVerified is required"],
+    },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       require: true,
