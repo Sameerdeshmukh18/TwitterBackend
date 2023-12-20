@@ -7,6 +7,7 @@ const {
   getUser,
   checkUsername,
   me,
+  authenticate_g
 } = require("../Controllers/userController");
 
 const {
@@ -68,6 +69,7 @@ const resolvers = {
   },
   Query: {
     me: me,
+    authenticate: authenticate_g,
     getUserById: userDetails_g,
     getTweetById: getTweet_g,
     getMyTweets: getMyTweets_g,

@@ -27,6 +27,15 @@ const me = async (_, __, context) => {
   }
 };
 
+const authenticate_g = async(_, __, context) => {
+  if(checkAuth(context)){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
 const registerUser_g = async (_, { name, username, email, password, dob }) => {
   const userAvailable = await User.findOne({ email });
   if (userAvailable) {
@@ -138,6 +147,7 @@ const checkUsername = async (_, { username }) => {
 
 module.exports = {
   me,
+  authenticate_g,
   registerUser_g,
   loginUser_g,
   userDetails_g,
