@@ -37,6 +37,7 @@ const typeDefs = `
   }
 
   type Query {
+    me: User
     getUserById(user_id: ID!): User
     getTweetById(tweet_id: ID!): Tweet
     getMyTweets: [Tweet]

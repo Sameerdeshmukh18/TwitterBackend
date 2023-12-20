@@ -14,6 +14,19 @@ const checkAuth = (context) => {
   }
 };
 
+const me = async (_, __, context) => {
+  if (checkAuth(context)) {
+    const user = await User.findById(context.user.id);
+    if (user) {
+      return user;
+    } else {
+      throw new Error("User not found");
+    }
+  } else {
+    throw new Error("User not authorized");
+  }
+};
+
 const registerUser_g = async (_, { name, username, email, password, dob }) => {
   const userAvailable = await User.findOne({ email });
   if (userAvailable) {
@@ -124,6 +137,7 @@ const checkUsername = async (_, { username }) => {
 };
 
 module.exports = {
+  me,
   registerUser_g,
   loginUser_g,
   userDetails_g,

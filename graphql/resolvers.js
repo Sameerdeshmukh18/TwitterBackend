@@ -6,6 +6,7 @@ const {
   userDetails_g,
   getUser,
   checkUsername,
+  me,
 } = require("../Controllers/userController");
 
 const {
@@ -66,6 +67,7 @@ const resolvers = {
     liked_by: (tweet, _, context) => getLikedBy(tweet, _, context),
   },
   Query: {
+    me: me,
     getUserById: userDetails_g,
     getTweetById: getTweet_g,
     getMyTweets: getMyTweets_g,
