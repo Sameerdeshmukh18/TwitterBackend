@@ -41,8 +41,6 @@ Add inline-policy lets call it `deploy-backend-application-to-elasticbeanstalk`
 }
 ```
 
-Also Give AWS S3 Full Access directly attach this permission to user
-
 Note: Permissions granted to the user must be thouhrougly checked as we can limit the permissions to user based on the actions performed by them in aws account.
 
 Create Access Key
@@ -62,10 +60,5 @@ In case of any change we don't have to update the pipeline but the secrets.
 For example: Using New AWS credentials or region etc.
 
 
-# To Do
-Update pipeline to utilize different .env while deploying to elasticbeanstalk
-For example:
-	.env.qa on devtest branch
-	.env.prod on master branch
 
 	
