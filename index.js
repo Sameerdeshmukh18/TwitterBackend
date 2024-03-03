@@ -27,7 +27,7 @@ const startServer = async () => {
     "/",
     (req, res) => {
       res.send({
-        "Message": "Node JS Backend Application Running on EC2 AWS :)",
+        "Message": "Node JS Backend Application Running on EC2 Instance :)",
         "GitHub_Actions": "This application is deployed using GitHub Actions Workflow :)",
         "Environment_Title": process.env.ENVIRONMENT_TITLE
       })
