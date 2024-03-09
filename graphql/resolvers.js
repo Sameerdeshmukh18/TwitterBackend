@@ -7,7 +7,8 @@ const {
   getUser,
   checkUsername,
   me,
-  authenticate_g
+  authenticate_g,
+  getProfilePhotoPresignedUploadURL_g
 } = require("../Controllers/userController");
 
 const {
@@ -89,6 +90,7 @@ const resolvers = {
     deleteComment: deleteComment_g,
     likeComment: likeComment_g,
     disLikeComment: disLikeComment_g,
+    getProfilePhotoPresignedUploadURL: getProfilePhotoPresignedUploadURL_g
   },
 };
 

@@ -6,3 +6,7 @@ exports.constants={
     SERVER_ERROR:500,
 
 };
+
+exports.bucketNames = {
+    USER_PROFILE_PHOTO_BUCKET: 'tkiosk-user-profile-photo'
+}
