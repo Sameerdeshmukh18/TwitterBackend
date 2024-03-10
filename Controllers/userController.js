@@ -7,7 +7,13 @@ const { default: mongoose } = require("mongoose");
 const { bucketNames } = require('../Constants');
 
 const checkAuth = (context) => {
-  return context.user ? true : false;
+  const user = context.user;
+
+  if (!user) {
+    return false;
+  } else {
+    return true;
+  }
 };
 
 const me = async (_, __, context) => {
@@ -24,7 +30,12 @@ const me = async (_, __, context) => {
 };
 
 const authenticate_g = async(_, __, context) => {
-  return checkAuth(context);
+  if(checkAuth(context)){
+    return true;
+  }
+  else{
+    return false;
+  }
 }
 
 const registerUser_g = async (_, { name, username, email, password, dob }) => {
