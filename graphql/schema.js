@@ -43,6 +43,12 @@ const typeDefs = `
     endCursor: String!
   }
 
+  type ProfilePhotoUPloadPresignedURL {
+    file_name: String!,
+    file_type: String!,
+    uploadURL: String!
+  }
+
   type Query {
     me: User
     authenticate: Boolean
@@ -67,6 +73,7 @@ const typeDefs = `
     deleteComment(comment_id: ID!): Comment
     likeComment(comment_id: ID!): Comment
     disLikeComment(comment_id: ID!): Comment
+    getProfilePhotoPresignedUploadURL(file_name: String!, file_type: String!): ProfilePhotoUPloadPresignedURL
   }
 `;
 

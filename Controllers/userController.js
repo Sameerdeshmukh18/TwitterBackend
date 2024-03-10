@@ -1,8 +1,10 @@
 const expressAsyncHandler = require("express-async-handler");
+const S3Client = require("../Clients/S3Client")
 const User = require("../Models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { default: mongoose } = require("mongoose");
+const { bucketNames } = require('../Constants');
 
 const checkAuth = (context) => {
   const user = context.user;
@@ -160,6 +162,15 @@ const checkUsername = async (_, { username }) => {
   }
 };
 
+const getProfilePhotoPresignedUploadURL_g = async (_, { file_name, file_type }) => {
+  console.log(`File Name: ${file_name}`)
+  console.log(`File Type: ${file_type}`)
+  const s3Client = new S3Client();
+  const bucketName = bucketNames.USER_PROFILE_PHOTO_BUCKET
+  const uploadURL = s3Client.getPresignedUrl(bucketName, file_name, file_type)
+  return { uploadURL, file_name, file_type }
+}
+
 module.exports = {
   me,
   authenticate_g,
@@ -169,4 +180,5 @@ module.exports = {
   getUser,
   editBio,
   checkUsername,
+  getProfilePhotoPresignedUploadURL_g
 };
