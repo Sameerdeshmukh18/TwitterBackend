@@ -5,13 +5,7 @@ const { default: mongoose } = require("mongoose");
 const { ObjectId } = require("mongoose").Types;
 
 const checkAuth = (context) => {
-  const user = context.user;
-  console.log(user);
-  if (!user) {
-    return false;
-  } else {
-    return true;
-  }
+  return context.user ? true : false;
 };
 
 //resolver

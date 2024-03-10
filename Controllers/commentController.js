@@ -4,12 +4,7 @@ const User = require("../Models/userModel");
 const Comment = require("../Models/commentModel");
 
 const checkAuth = (context) => {
-  const user = context.user;
-  if (!user) {
-    return false;
-  } else {
-    return true;
-  }
+  return context.user ? true : false;
 };
 
 //resolver
