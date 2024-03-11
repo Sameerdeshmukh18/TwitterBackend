@@ -154,6 +154,10 @@ const checkUsername = async (_, { username }) => {
 const getProfilePhotoPresignedUploadURL_g = async (_, { file_name, file_type }) => {
   console.log(`File Name: ${file_name}`)
   console.log(`File Type: ${file_type}`)
+
+  // Get actual Id of the user some hash I guess :)
+  const userId = "jncudhilqwehfjhucahdafsdhfsfhkdj"
+  file_name = `${userId}/ProfilePhoto`
   const s3Client = new S3Client();
   const bucketName = bucketNames.USER_PROFILE_PHOTO_BUCKET
   const uploadURL = s3Client.getPresignedUrl(bucketName, file_name, file_type)
