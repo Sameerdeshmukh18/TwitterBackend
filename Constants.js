@@ -8,5 +8,5 @@ exports.constants={
 };
 
 exports.bucketNames = {
-    USER_PROFILE_PHOTO_BUCKET: 'tkiosk-user-profile-photo'
+    USER_PROFILE_PHOTO_BUCKET: 'tkiosk-users-data'
 }
