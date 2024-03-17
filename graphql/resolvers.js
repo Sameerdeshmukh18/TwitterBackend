@@ -30,6 +30,7 @@ const {
   likeComment_g,
   disLikeComment_g,
   deleteComment_g,
+  getTweetComments_g
 } = require("../Controllers/commentController");
 
 const dateScalar = new GraphQLScalarType({
@@ -77,6 +78,7 @@ const resolvers = {
     checkUsername: checkUsername,
     homeTimeline: homeTimeline_g,
     userTimeline: userTimeline_g,
+    getTweetComments: getTweetComments_g
   },
   Mutation: {
     register: registerUser_g,
