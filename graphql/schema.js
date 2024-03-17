@@ -9,7 +9,7 @@ const typeDefs = `
     dob: Date
     bio: String
     password: String!
-    isVertified: Boolean
+    isVerified: Boolean!
     followers: [User]
     following: [User]
   }
@@ -43,6 +43,11 @@ const typeDefs = `
     endCursor: String!
   }
 
+  type PaginatedComments{
+    comments: [Comment],
+    endCursor: String!
+  }
+
   type ProfilePhotoUPloadPresignedURL {
     file_name: String!,
     file_type: String!,
@@ -58,6 +63,7 @@ const typeDefs = `
     checkUsername(username: String!): Boolean
     homeTimeline(first:Int, after: ID): PaginatedItems!
     userTimeline(user_id: ID!,first:Int, after: ID): PaginatedItems!
+    getTweetComments(tweet_id: ID!, first:Int,after:ID): PaginatedComments!
   }
 
   type Mutation {
